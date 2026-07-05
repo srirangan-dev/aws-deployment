@@ -16,7 +16,7 @@ jobs:
           npm install
           npm run build
         env:
-          VITE_API_URL: http://${{ secrets.EC2_HOST }}:5000
+          VITE_API_URL: https://pathfinder-api.duckdns.org
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
