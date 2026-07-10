@@ -1,26 +1,28 @@
-# 🧭 PathFinder — Your Career & Education Advisor
+🧭 PathFinder — Your Career & Education Advisor
+AWS React Node.js Docker CI/CD Live
 
-![AWS](https://img.shields.io/badge/AWS-EC2%20%7C%20S3%20%7C%20CloudFront%20%7C%20IAM-orange?logo=amazon-aws)
-![React](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-blue?logo=react)
-![Node.js](https://img.shields.io/badge/Backend-Node.js-green?logo=node.js)
-![Docker](https://img.shields.io/badge/Docker-Containerized-blue?logo=docker)
-![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-black?logo=github-actions)
-![Live](https://img.shields.io/badge/Live-View%20Demo-brightgreen)
+An AI-powered career and education advisor web application, fully deployed on AWS with a production-grade DevOps pipeline.
 
-> An AI-powered career and education advisor web application, fully deployed on AWS with a production-grade DevOps pipeline.
+🌐 Live Demo: https://d16o598lw6btin.cloudfront.net/
 
-🌐 **Live Demo:** [https://d16o598lw6btin.cloudfront.net/](https://d16o598lw6btin.cloudfront.net/)
+📌 Project Overview
+PathFinder helps students figure out which stream, degree, or career path to pursue after Class 10/12 — offering free, personalized guidance in the student's own language, no registration required. It is a full-stack application with a React (Vite) frontend and Node.js backend, deployed on AWS using Docker, GitHub Actions CI/CD, S3, CloudFront, and EC2.
 
----
+✨ Features
 
-## 📌 Project Overview
+- 🧠 **Free Career Quiz** — a no-signup quiz that recommends career paths based on the student's interests and answers
+- 🗺️ **Career Map** — visual exploration of career paths and where they lead (e.g. B.Sc → IIT/NIT, B.A. → UPSC, B.Com → CA)
+- 🏫 **Colleges** — browse and discover relevant colleges by stream
+- 📅 **Timeline** — likely tracks key academic/application deadlines and milestones
+- 📚 **Learn** — educational content/resources section
+- 🌍 **10+ Regional Languages** — accessible to students across different linguistic backgrounds
+- 📴 **Works Offline** — usable without a constant internet connection
+- 🔓 **No Registration Needed** — students can take the quiz and explore without signing up first
+- 🔐 **Login / Sign Up** — optional account creation for saving progress/personalization
+- 🤖 **AI chatbot** (floating widget, bottom-right) — powered by Groq AI for career guidance and doubt-solving
+- 🎨 Dark-themed, modern UI with bold typography and stream-specific cards (Science / Arts / Commerce)
 
-PathFinder is an AI-powered career and education advisory platform that helps users discover the right career paths and educational routes based on their interests, skills, and goals. It is a full-stack application with a React frontend and Node.js backend, deployed on AWS using Docker, GitHub Actions CI/CD, S3, CloudFront, and EC2.
-
----
-
-## 🏗️ Architecture Overview
-
+🏗️ Architecture Overview
 ```
 User Browser
      │
@@ -51,49 +53,43 @@ User Browser
 └──────────────────────────┘
 ```
 
----
-
-## ☁️ AWS Services Used
+☁️ AWS Services Used
 
 | Service | Purpose |
 |---|---|
-| **EC2** | Hosts the Node.js backend server (Ubuntu instance) |
-| **S3** | Stores React frontend Vite production build files |
-| **CloudFront** | CDN for fast global delivery of frontend with HTTPS |
-| **IAM** | Manages GitHub Actions credentials securely (least privilege) |
+| EC2 | Hosts the Node.js backend server (Ubuntu instance) |
+| S3 | Stores React frontend Vite production build files |
+| CloudFront | CDN for fast global delivery of frontend with HTTPS |
+| IAM | Manages GitHub Actions credentials securely (least privilege) |
 
----
+🛠️ Tech Stack
 
-## 🛠️ Tech Stack
+**Frontend**
+- React + Vite — fast modern frontend framework
+- Deployed to: AWS S3 → served via CloudFront CDN
 
-### Frontend
-- **React + Vite** — Fast modern frontend framework
-- **Deployed to:** AWS S3 → served via CloudFront CDN
+**Backend**
+- Node.js — backend API server (Port 5000)
+- MongoDB — database
+- Groq AI — AI-powered career advice API
+- JWT — authentication
+- Nodemailer — email service
+- Deployed to: AWS EC2 via Docker Compose
 
-### Backend
-- **Node.js** — Backend API server (Port 5000)
-- **MongoDB** — Database
-- **GROQ AI** — AI-powered career advice API
-- **JWT** — Authentication
-- **Nodemailer** — Email service
-- **Deployed to:** AWS EC2 via Docker Compose
+**Cloud**
+- AWS EC2 — virtual machine for backend
+- AWS S3 — static frontend hosting
+- AWS CloudFront — CDN with HTTPS
+- AWS IAM — access management
 
-### Cloud
-- **AWS EC2** — Virtual machine for backend
-- **AWS S3** — Static frontend hosting
-- **AWS CloudFront** — CDN with HTTPS
-- **AWS IAM** — Access management
+**DevOps**
+- Docker — backend containerization
+- Docker Compose — container orchestration
+- GitHub Actions — CI/CD pipeline (2 jobs: frontend + backend)
 
-### DevOps
-- **Docker** — Backend containerization
-- **Docker Compose** — Container orchestration
-- **GitHub Actions** — CI/CD pipeline (2 jobs: frontend + backend)
+⚙️ CI/CD Pipeline — How It Works
 
----
-
-## ⚙️ CI/CD Pipeline — How It Works
-
-Every push to `main` branch triggers **two parallel jobs** in GitHub Actions:
+Every push to the `main` branch triggers two parallel jobs in GitHub Actions:
 
 ```
 Push to main branch
@@ -119,26 +115,22 @@ Push to main branch
 └───────────────┘
 ```
 
----
-
-## 🔐 GitHub Actions Secrets Required
+🔐 GitHub Actions Secrets Required
 
 | Secret Name | Description |
 |---|---|
-| `AWS_ACCESS_KEY_ID` | AWS IAM access key for S3 + CloudFront access |
-| `AWS_SECRET_ACCESS_KEY` | AWS IAM secret key |
-| `EC2_HOST` | EC2 instance public IP address |
-| `EC2_SSH_KEY` | Private SSH key to connect to EC2 |
-| `MONGODB_URI` | MongoDB connection string |
-| `JWT_SECRET` | Secret key for JWT authentication |
-| `GROQ_KEY` | GROQ AI API key |
-| `EMAIL_USER` | Email address for Nodemailer |
-| `EMAIL_PASS` | Email password for Nodemailer |
-| `CLOUDFRONT_URL` | CloudFront distribution URL |
+| AWS_ACCESS_KEY_ID | AWS IAM access key for S3 + CloudFront access |
+| AWS_SECRET_ACCESS_KEY | AWS IAM secret key |
+| EC2_HOST | EC2 instance public IP address |
+| EC2_SSH_KEY | Private SSH key to connect to EC2 |
+| MONGODB_URI | MongoDB connection string |
+| JWT_SECRET | Secret key for JWT authentication |
+| GROQ_KEY | Groq AI API key |
+| EMAIL_USER | Email address for Nodemailer |
+| EMAIL_PASS | Email password for Nodemailer |
+| CLOUDFRONT_URL | CloudFront distribution URL |
 
----
-
-## 🚀 Run Locally
+🚀 Run Locally
 
 ```bash
 # Clone the repository
@@ -157,9 +149,7 @@ npm install
 node index.js
 ```
 
----
-
-## 📁 Project Structure
+📁 Project Structure
 
 ```
 aws-deployment/
@@ -179,25 +169,17 @@ aws-deployment/
 └── README.md
 ```
 
----
+🌍 CloudFront Configuration
+- Origin: AWS S3 bucket (`pathfinder-frontend-2026`)
+- Distribution ID: `E3TLCI4XOP06AT`
+- HTTPS: Enabled via CloudFront SSL
+- Cache Invalidation: `/*` invalidated automatically on every frontend deploy
 
-## 🌍 CloudFront Configuration
-
-- **Origin:** AWS S3 bucket (`pathfinder-frontend-2026`)
-- **Distribution ID:** `E3TLCI4XOP06AT`
-- **HTTPS:** Enabled via CloudFront SSL
-- **Cache Invalidation:** `/*` invalidated automatically on every frontend deploy
-
----
-
-## 👨‍💻 Author
+👨‍💻 Author
 
 **Srirangan**
 - GitHub: [@srirangan-dev](https://github.com/srirangan-dev)
 - LinkedIn: [Add your LinkedIn URL here]
 
----
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
+📄 License
+This project is open source and available under the MIT License.
