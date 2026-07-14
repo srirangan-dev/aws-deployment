@@ -68,4 +68,28 @@ function reminderTemplate(event, remindOn) {
   `
 }
 
-module.exports = { sendEmail, subscribeConfirmTemplate, reminderTemplate }
+function resetPasswordTemplate(resetLink, userName) {
+  return `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+      <h2>🔐 Reset Your Password</h2>
+      <p>Hi${userName ? ' ' + userName : ''},</p>
+      <p>We received a request to reset your password. Click the button below to choose a new one:</p>
+      <p style="text-align: center; margin: 24px 0;">
+        <a href="${resetLink}" style="background: #3B82F6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">
+          Reset Password
+        </a>
+      </p>
+      <p style="color: #94A3B8; font-size: 0.85rem;">
+        If you didn't request this, you can safely ignore this email. This link will expire in 1 hour.
+      </p>
+      <p style="color: #94A3B8; font-size: 0.85rem;">— PathFinder</p>
+    </div>
+  `
+}
+
+module.exports = {
+  sendEmail,
+  subscribeConfirmTemplate,
+  reminderTemplate,
+  resetPasswordTemplate,
+}
