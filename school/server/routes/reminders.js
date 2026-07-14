@@ -54,13 +54,26 @@ router.post('/subscribe', async (req, res) => {
       remindOn: normalizedRemindOn,
     })
 
-    // Fire-and-forget: don't let a slow/failing SMTP connection block the response.
-    // The subscription (the important part) is already saved above.
-    sendEmail({
-      to: email,
-      subject: '🔔 Reminder subscription confirmed — PathFinder',
-      html: subscribeConfirmTemplate(event, normalizedRemindOn),
-    }).catch(err => console.error('Confirmation email failed:', err.message))
+    // FIX: this used to be fire-and-forget (sendEmail(...).catch(...) with the
+    // res.json sent immediately after, not waiting for the result). That meant
+    // a failed SMTP send (bad auth, rate limit, etc.) was only ever logged on
+    // the server — the user always saw "Subscribed! We will email you..." even
+    // when no email went out at all. Now we await it and tell the user the
+    // truth if it fails. The subscription itself is already saved above either
+    // way, so we don't roll that back on an email failure.
+    try {
+      await sendEmail({
+        to: email,
+        subject: '🔔 Reminder subscription confirmed — PathFinder',
+        html: subscribeConfirmTemplate(event, normalizedRemindOn),
+      })
+    } catch (err) {
+      console.error('Confirmation email failed:', err.message)
+      return res.json({
+        ok: true,
+        message: 'Subscribed! (Note: the confirmation email failed to send — your reminder is still saved.)',
+      })
+    }
 
     res.json({ ok: true, message: 'Subscribed! We will email you before the deadline.' })
   } catch (err) {

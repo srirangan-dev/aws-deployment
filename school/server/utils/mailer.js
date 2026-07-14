@@ -68,6 +68,33 @@ function reminderTemplate(event, remindOn) {
   `
 }
 
+// Used for general (eventId: null) subscribers whose custom remindOn time has
+// arrived — there's no single event to reference, so send a digest of every
+// currently upcoming high-priority event instead.
+function digestReminderTemplate(events, remindOn) {
+  const formatted = formatRemindOn(remindOn)
+  const rows = events
+    .map(
+      e => `
+    <li style="margin-bottom: 8px;">
+      <strong>${e.title}</strong> — deadline ${e.deadline}
+      (${e.daysLeft} day${e.daysLeft === 1 ? '' : 's'} left)
+    </li>`
+    )
+    .join('')
+
+  return `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+      <h2>⏰ Reminder${formatted ? ` for ${formatted} (IST)` : ''}</h2>
+      <p>Here are your upcoming high-priority deadlines:</p>
+      <ul style="padding-left: 20px;">
+        ${rows || '<li>No high-priority deadlines currently open.</li>'}
+      </ul>
+      <p style="color: #94A3B8; font-size: 0.85rem;">— PathFinder</p>
+    </div>
+  `
+}
+
 function resetPasswordTemplate(resetLink, userName) {
   return `
     <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
@@ -91,5 +118,6 @@ module.exports = {
   sendEmail,
   subscribeConfirmTemplate,
   reminderTemplate,
+  digestReminderTemplate,
   resetPasswordTemplate,
 }

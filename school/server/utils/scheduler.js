@@ -1,7 +1,7 @@
 const cron = require('node-cron')
 const Reminder = require('../models/Reminder')
 const { getAllEvents } = require('../data/events')
-const { sendEmail, reminderTemplate } = require('./mailer')
+const { sendEmail, reminderTemplate, digestReminderTemplate } = require('./mailer')
 
 const REMINDER_WINDOWS = [30, 7, 3, 1]
 
@@ -35,6 +35,7 @@ async function checkAndSendReminders() {
         await sub.save()
       } catch (err) {
         console.error(`Reminder email failed for ${sub.email}:`, err.message)
+        // Don't push the tag — leave it to retry on the next daily run.
       }
     }
   }
@@ -43,6 +44,14 @@ async function checkAndSendReminders() {
 // Send reminders for subscribers who picked a specific custom date + time.
 // Runs on a tighter cadence (every 15 min) than the daily window check above,
 // since a person picking "3:45 PM" expects the email close to that time, not at 9am.
+//
+// FIX: general subscriptions (sub.eventId === null, made from the "Subscribe Free"
+// banner / "Set Reminder" on the upcoming-this-month card) were previously being
+// skipped entirely here because there's no single `event` to look up — the loop
+// did `if (!event) continue`, which silently dropped these subscribers on every
+// run, forever, without ever marking them as sent or failed. Now we send a
+// digest of upcoming high-priority events for the general case instead of
+// looking up one specific event.
 async function checkCustomDateReminders() {
   const events = getAllEvents()
   const eventById = new Map(events.map(e => [e.id, e]))
@@ -57,19 +66,37 @@ async function checkCustomDateReminders() {
   })
 
   for (const sub of subscribers) {
-    const event = sub.eventId ? eventById.get(sub.eventId) : null
-    if (!event) continue
-
     try {
-      await sendEmail({
-        to: sub.email,
-        subject: `⏰ Reminder — ${event.title}`,
-        html: reminderTemplate(event, sub.remindOn),
-      })
+      if (sub.eventId) {
+        // Specific event
+        const event = eventById.get(sub.eventId)
+        if (!event) {
+          // Event no longer exists in EVENTS (e.g. removed) — mark as sent so
+          // it doesn't get retried forever, but there's nothing to email about.
+          sub.sentFor.push('custom')
+          await sub.save()
+          continue
+        }
+        await sendEmail({
+          to: sub.email,
+          subject: `⏰ Reminder — ${event.title}`,
+          html: reminderTemplate(event, sub.remindOn),
+        })
+      } else {
+        // General subscription — send a digest of upcoming high-priority events
+        const highPriorityUpcoming = events.filter(e => e.priority === 'high' && e.status === 'upcoming')
+        await sendEmail({
+          to: sub.email,
+          subject: `⏰ Your PathFinder reminder — upcoming deadlines`,
+          html: digestReminderTemplate(highPriorityUpcoming, sub.remindOn),
+        })
+      }
       sub.sentFor.push('custom')
       await sub.save()
     } catch (err) {
       console.error(`Custom reminder email failed for ${sub.email}:`, err.message)
+      // Don't push 'custom' here — the email genuinely failed to send (e.g. SMTP
+      // error), so leave it un-tagged and let the next 15-min run retry it.
     }
   }
 }
