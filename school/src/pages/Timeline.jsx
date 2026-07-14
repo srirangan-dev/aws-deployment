@@ -66,6 +66,7 @@ export default function Timeline() {
   const [modalTime, setModalTime] = useState('09:00')
   const [modalEmail, setModalEmail] = useState(email)
   const [submitting, setSubmitting] = useState(false)
+  const [modalMsg, setModalMsg] = useState(null) // { type: 'success' | 'error' | 'warning', text }
 
   useEffect(() => {
     fetch(`${API_URL}/api/events`)
@@ -84,21 +85,23 @@ export default function Timeline() {
     // Default to 7 days before deadline if the event has one, else empty
     setModalDate(event?.deadline ? daysBefore(event.deadline, 7) : '')
     setModalTime('09:00')
+    setModalMsg(null)
   }
 
   function closeModal() {
     setModalEvent(null)
     setModalDate('')
     setModalTime('09:00')
+    setModalMsg(null)
   }
 
   async function confirmSubscribe() {
     if (!modalEmail) {
-      setSubMsg('Please enter your email.')
-      setTimeout(() => setSubMsg(''), 4000)
+      setModalMsg({ type: 'error', text: 'Please enter your email.' })
       return
     }
     setSubmitting(true)
+    setModalMsg(null)
     const eventId = modalEvent && modalEvent !== 'general' ? modalEvent.id : null
 
     // Combine the date + time pickers into a single ISO datetime for the backend.
@@ -113,14 +116,37 @@ export default function Timeline() {
         body: JSON.stringify({ email: modalEmail, eventId, remindOn: remindOnIso }),
       })
       const data = await res.json()
+
+      if (!res.ok || !data.ok) {
+        // Server rejected the request outright (bad email, invalid date, event not found, etc.)
+        setModalMsg({ type: 'error', text: data.error || 'Something went wrong — try again.' })
+        setSubmitting(false)
+        return // keep modal open so the user can fix the input
+      }
+
       setEmail(modalEmail)
+
+      // The backend distinguishes a clean success from "saved but confirmation
+      // email failed to send" — surface that difference instead of showing the
+      // same green success message either way.
+      const emailFailed = /confirmation email failed/i.test(data.message || '')
       setSubMsg(data.message || 'Subscribed!')
+
+      // Briefly show the result inside the modal itself before closing, so the
+      // user actually sees whether the email went out or not.
+      setModalMsg({
+        type: emailFailed ? 'warning' : 'success',
+        text: data.message || 'Subscribed! We will email you before the deadline.',
+      })
+      setSubmitting(false)
+      setTimeout(() => {
+        closeModal()
+        setTimeout(() => setSubMsg(''), 4000)
+      }, emailFailed ? 3000 : 1400)
     } catch (err) {
-      setSubMsg('Something went wrong — try again.')
+      setModalMsg({ type: 'error', text: 'Network error — could not reach the server. Try again.' })
+      setSubmitting(false)
     }
-    setSubmitting(false)
-    closeModal()
-    setTimeout(() => setSubMsg(''), 4000)
   }
 
   const filtered = events.filter(e =>
@@ -136,6 +162,12 @@ export default function Timeline() {
   const modalEventObj = modalEvent && modalEvent !== 'general' ? modalEvent : null
   const todayStr = new Date().toISOString().slice(0, 10)
   const maxDateStr = modalEventObj?.deadline || undefined
+
+  const MODAL_MSG_STYLES = {
+    success: { bg: '#F0FDF4', border: '#86EFAC', color: '#15803D', icon: '✅' },
+    warning: { bg: '#FFFBEB', border: '#FCD34D', color: '#B45309', icon: '⚠️' },
+    error:   { bg: '#FEF2F2', border: '#FCA5A5', color: '#B91C1C', icon: '❌' },
+  }
 
   return (
     <div style={{ paddingTop: 68, background: 'var(--cream)', minHeight: '100vh' }}>
@@ -395,6 +427,20 @@ export default function Timeline() {
               </div>
             )}
 
+            {modalMsg && (
+              <div style={{
+                display: 'flex', alignItems: 'flex-start', gap: 8, padding: '10px 14px', borderRadius: 12,
+                background: MODAL_MSG_STYLES[modalMsg.type].bg,
+                border: `1px solid ${MODAL_MSG_STYLES[modalMsg.type].border}`,
+                marginBottom: 18,
+              }}>
+                <span>{MODAL_MSG_STYLES[modalMsg.type].icon}</span>
+                <p style={{ fontSize: '0.82rem', color: MODAL_MSG_STYLES[modalMsg.type].color, lineHeight: 1.4 }}>
+                  {modalMsg.text}
+                </p>
+              </div>
+            )}
+
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={closeModal} className="btn btn-ghost" style={{ flex: 1 }}>Cancel</button>
               <button
@@ -403,7 +449,7 @@ export default function Timeline() {
                 className="btn btn-primary"
                 style={{ flex: 1, opacity: submitting ? 0.6 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
               >
-                {submitting ? 'Saving...' : 'Confirm Reminder'}
+                {submitting ? 'Sending...' : 'Confirm Reminder'}
               </button>
             </div>
           </div>
