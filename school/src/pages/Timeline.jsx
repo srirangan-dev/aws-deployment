@@ -1,118 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-
-const EVENTS = [
-  {
-    id: 1,
-    
-    title: 'DU Undergraduate Admissions Open',
-    type: 'Admission',
-    date: '2025-06-01',
-    deadline: '2025-06-30',
-    daysLeft: 45,
-    status: 'upcoming',
-    description: 'Delhi University CSAS portal opens for B.A., B.Sc., B.Com UG admissions.',
-    streams: ['Arts', 'Science', 'Commerce'],
-    link: '#',
-    priority: 'high',
-  },
-
-  
-  {
-    id: 2,
-    
-    title: 'NSP Scholarship Application Window',
-    type: 'Scholarship',
-    date: '2025-07-01',
-    deadline: '2025-09-30',
-    daysLeft: 100,
-    status: 'upcoming',
-    description: 'National Scholarship Portal — apply for PM Scholarship, Merit-cum-Means, and state scholarships.',
-    streams: ['All'],
-    link: '#',
-    priority: 'high',
-  },
-  {
-    id: 3,
-    title: 'CUET UG Result Declared',
-    type: 'Exam Result',
-    date: '2025-05-20',
-    deadline: null,
-    daysLeft: -5,
-    status: 'past',
-    description: 'CUET UG 2025 results have been announced. Check your score card.',
-    streams: ['All'],
-    link: '#',
-    priority: 'medium',
-  },
-
-  
-  {
-    id: 4,
-    title: 'Maharashtra CET Counselling Begins',
-    type: 'Counselling',
-    date: '2025-06-15',
-    deadline: '2025-07-15',
-    daysLeft: 20,
-    status: 'upcoming',
-    description: 'Maharashtra State CET Cell starts UG counselling for B.Sc., B.Com., B.A. in government colleges.',
-    streams: ['Science', 'Commerce', 'Arts'],
-    link: '#',
-    priority: 'high',
-  },
-  {
-    id: 5,
-    title: 'Rajasthan Govt College Admission Last Date',
-    type: 'Admission',
-    date: '2025-07-20',
-    deadline: '2025-07-20',
-    daysLeft: 55,
-    status: 'upcoming',
-    description: 'Last date for online application to Rajasthan government degree colleges through SSO portal.',
-    streams: ['All'],
-    link: '#',
-    priority: 'medium',
-  },
-  {
-    id: 6,
-    title: 'NEET UG Counselling Round 1',
-    type: 'Counselling',
-    date: '2025-08-01',
-    deadline: '2025-08-15',
-    daysLeft: 67,
-    status: 'upcoming',
-    description: 'MCC announces NEET UG 2025 counselling for MBBS/BDS admission in government medical colleges.',
-    streams: ['Science'],
-    link: '#',
-    priority: 'high',
-  },
-  {
-    id: 7,
-    title: 'Post-Matric SC/ST Scholarship Deadline',
-    type: 'Scholarship',
-    date: '2025-10-31',
-    deadline: '2025-10-31',
-    daysLeft: 158,
-    status: 'upcoming',
-    description: 'Apply for Post-Matric Scholarship for SC/ST students enrolled in government colleges.',
-    streams: ['All'],
-    link: '#',
-    priority: 'medium',
-  },
-  {
-    id: 8,
-    title: 'CUET UG 2025 Registration Opens',
-    type: 'Exam',
-    date: '2025-02-15',
-    deadline: '2025-03-31',
-    daysLeft: -60,
-    status: 'past',
-    description: 'CUET UG 2025 registration closed. Results expected in May 2025.',
-    streams: ['All'],
-    link: '#',
-    priority: 'low',
-  },
-]
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 const TYPE_COLORS = {
   'Admission': { color: '#F97316', bg: '#FFF7ED' },
@@ -124,19 +12,130 @@ const TYPE_COLORS = {
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-export default function Timeline() {
-  const [filter, setFilter] = useState('All')
-  const [streamFilter, setStreamFilter] = useState('All')
-  const [view, setView] = useState('list')
+function downloadIcs(event) {
+  const date = (event.deadline || event.date).replace(/-/g, '')
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'BEGIN:VEVENT',
+    `UID:${event.id}@pathfinder`,
+    `DTSTART;VALUE=DATE:${date}`,
+    `DTEND;VALUE=DATE:${date}`,
+    `SUMMARY:${event.title}`,
+    `DESCRIPTION:${event.description}`,
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n')
 
-  const filtered = EVENTS.filter(e =>
+  const blob = new Blob([ics], { type: 'text/calendar' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${event.title.replace(/[^a-z0-9]/gi, '_')}.ics`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+// Quick-pick offsets relative to the event's deadline, shown as buttons in the modal
+function daysBefore(deadline, n) {
+  const d = new Date(deadline)
+  d.setDate(d.getDate() - n)
+  return d.toISOString().slice(0, 10)
+}
+
+export default function Timeline() {
+  const [events, setEvents] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState('All')
+  const [streamFilter, setStreamFilter] = useState(() => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || 'null')
+      return user?.stream || 'All'
+    } catch {
+      return 'All'
+    }
+  })
+  const [email, setEmail] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('user') || 'null')?.email || '' } catch { return '' }
+  })
+  const [subMsg, setSubMsg] = useState('')
+
+  // Reminder modal state
+  const [modalEvent, setModalEvent] = useState(null) // the event object, or 'general' for the bottom banner, or null = closed
+  const [modalDate, setModalDate] = useState('')
+  const [modalTime, setModalTime] = useState('09:00')
+  const [modalEmail, setModalEmail] = useState(email)
+  const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/events`)
+      .then(res => {
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`)
+        return res.json()
+      })
+      .then(data => setEvents(data.events || []))
+      .catch(err => console.error('Failed to load events:', err))
+      .finally(() => setLoading(false))
+  }, [])
+
+  function openReminderModal(event) {
+    setModalEvent(event || 'general')
+    setModalEmail(email)
+    // Default to 7 days before deadline if the event has one, else empty
+    setModalDate(event?.deadline ? daysBefore(event.deadline, 7) : '')
+    setModalTime('09:00')
+  }
+
+  function closeModal() {
+    setModalEvent(null)
+    setModalDate('')
+    setModalTime('09:00')
+  }
+
+  async function confirmSubscribe() {
+    if (!modalEmail) {
+      setSubMsg('Please enter your email.')
+      setTimeout(() => setSubMsg(''), 4000)
+      return
+    }
+    setSubmitting(true)
+    const eventId = modalEvent && modalEvent !== 'general' ? modalEvent.id : null
+
+    // Combine the date + time pickers into a single ISO datetime for the backend.
+    const remindOnIso = modalDate
+      ? new Date(`${modalDate}T${modalTime || '09:00'}`).toISOString()
+      : null
+
+    try {
+      const res = await fetch(`${API_URL}/api/reminders/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: modalEmail, eventId, remindOn: remindOnIso }),
+      })
+      const data = await res.json()
+      setEmail(modalEmail)
+      setSubMsg(data.message || 'Subscribed!')
+    } catch (err) {
+      setSubMsg('Something went wrong — try again.')
+    }
+    setSubmitting(false)
+    closeModal()
+    setTimeout(() => setSubMsg(''), 4000)
+  }
+
+  const filtered = events.filter(e =>
     (filter === 'All' || e.type === filter) &&
     (streamFilter === 'All' || e.streams.includes(streamFilter) || e.streams.includes('All'))
   )
 
-  const upcoming = filtered.filter(e => e.status === 'upcoming')
-    .sort((a, b) => a.daysLeft - b.daysLeft)
+  const upcoming = filtered.filter(e => e.status === 'upcoming').sort((a, b) => a.daysLeft - b.daysLeft)
   const past = filtered.filter(e => e.status === 'past')
+  const nextTwo = upcoming.slice(0, 2)
+
+  const modalIsGeneral = modalEvent === 'general'
+  const modalEventObj = modalEvent && modalEvent !== 'general' ? modalEvent : null
+  const todayStr = new Date().toISOString().slice(0, 10)
+  const maxDateStr = modalEventObj?.deadline || undefined
 
   return (
     <div style={{ paddingTop: 68, background: 'var(--cream)', minHeight: '100vh' }}>
@@ -149,33 +148,30 @@ export default function Timeline() {
       </div>
 
       <div className="container" style={{ padding: '40px 24px' }}>
-        {/* Urgent Banner */}
-        <div style={{
-          background: 'linear-gradient(135deg, #FEF3C7, #FFF7ED)',
-          border: '1.5px solid #FCD34D',
-          borderRadius: 16, padding: '18px 22px',
-          display: 'flex', gap: 14, alignItems: 'center',
-          marginBottom: 32,
-        }}>
-          <span style={{ fontSize: '1.5rem' }}>⚡</span>
-          <div>
-            <p style={{ fontFamily: 'Sora, sans-serif', fontWeight: 700, color: '#92400E', marginBottom: 4 }}>
-              Upcoming This Month
-            </p>
-            <p style={{ fontSize: '0.88rem', color: '#B45309' }}>
-              Maharashtra CET Counselling starts in 20 days. DU Admissions open in 45 days.
-            </p>
+        {nextTwo.length > 0 && (
+          <div style={{
+            background: 'linear-gradient(135deg, #FEF3C7, #FFF7ED)',
+            border: '1.5px solid #FCD34D', borderRadius: 16, padding: '18px 22px',
+            display: 'flex', gap: 14, alignItems: 'center', marginBottom: 32, flexWrap: 'wrap',
+          }}>
+            <span style={{ fontSize: '1.5rem' }}>⚡</span>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <p style={{ fontFamily: 'Sora, sans-serif', fontWeight: 700, color: '#92400E', marginBottom: 4 }}>
+                Upcoming This Month
+              </p>
+              <p style={{ fontSize: '0.88rem', color: '#B45309' }}>
+                {nextTwo.map(e => `${e.title} in ${e.daysLeft} day${e.daysLeft === 1 ? '' : 's'}`).join(' · ')}
+              </p>
+            </div>
+            <button className="btn" onClick={() => openReminderModal('general')} style={{
+              marginLeft: 'auto', background: '#F59E0B', color: 'white', fontSize: '0.82rem',
+              padding: '8px 18px', whiteSpace: 'nowrap', border: 'none', cursor: 'pointer',
+            }}>Set Reminder</button>
           </div>
-          <button className="btn" style={{
-            marginLeft: 'auto', background: '#F59E0B', color: 'white', fontSize: '0.82rem',
-            padding: '8px 18px', whiteSpace: 'nowrap',
-          }}>Set Reminder</button>
-        </div>
+        )}
 
-        {/* Filters */}
         <div style={{
-          background: 'white', border: '1px solid #E8E0D5',
-          borderRadius: 16, padding: '16px 20px',
+          background: 'white', border: '1px solid #E8E0D5', borderRadius: 16, padding: '16px 20px',
           marginBottom: 32, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center',
         }}>
           <div style={{ display: 'flex', gap: 8, flex: 1, flexWrap: 'wrap' }}>
@@ -199,7 +195,9 @@ export default function Timeline() {
           </select>
         </div>
 
-        {/* Upcoming Events */}
+        {loading && <p style={{ color: '#94A3B8', textAlign: 'center', padding: 40 }}>Loading timeline...</p>}
+
+        {!loading && (
         <div style={{ marginBottom: 48 }}>
           <h3 style={{ fontFamily: 'DM Serif Display, serif', fontSize: '1.6rem', color: '#1E293B', marginBottom: 20 }}>
             Upcoming Dates ({upcoming.length})
@@ -208,19 +206,15 @@ export default function Timeline() {
             {upcoming.map((event) => {
               const tc = TYPE_COLORS[event.type] || { color: '#64748B', bg: '#F8FAFC' }
               const isUrgent = event.daysLeft <= 30
+              const urgencyPct = Math.max(0, Math.min(100, 100 - (event.daysLeft / 30) * 100))
               return (
                 <div key={event.id} className="card" style={{
-                  padding: '22px 24px',
-                  borderLeft: `4px solid ${tc.color}`,
-                  display: 'flex', gap: 18, alignItems: 'flex-start',
-                  flexWrap: 'wrap',
+                  padding: '22px 24px', borderLeft: `4px solid ${tc.color}`,
+                  display: 'flex', gap: 18, alignItems: 'flex-start', flexWrap: 'wrap',
                 }}>
-                  {/* Date block */}
                   <div style={{
-                    width: 60, textAlign: 'center',
-                    background: tc.bg, borderRadius: 12,
-                    padding: '10px 8px', flexShrink: 0,
-                    border: `1px solid ${tc.color}22`,
+                    width: 60, textAlign: 'center', background: tc.bg, borderRadius: 12,
+                    padding: '10px 8px', flexShrink: 0, border: `1px solid ${tc.color}22`,
                   }}>
                     <div style={{ fontSize: '0.72rem', fontFamily: 'Sora, sans-serif', fontWeight: 700, color: tc.color, textTransform: 'uppercase' }}>
                       {MONTHS[new Date(event.date).getMonth()]}
@@ -230,108 +224,198 @@ export default function Timeline() {
                     </div>
                   </div>
 
-                  {/* Info */}
                   <div style={{ flex: 1, minWidth: 200 }}>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 6, alignItems: 'center' }}>
-                      <span style={{
-                        padding: '3px 10px', borderRadius: 50,
-                        background: tc.bg, color: tc.color,
-                        fontSize: '0.72rem', fontFamily: 'Sora, sans-serif', fontWeight: 700,
-                      }}>{event.type}</span>
+                      <span style={{ padding: '3px 10px', borderRadius: 50, background: tc.bg, color: tc.color, fontSize: '0.72rem', fontFamily: 'Sora, sans-serif', fontWeight: 700 }}>{event.type}</span>
                       {isUrgent && (
-                        <span style={{
-                          padding: '3px 10px', borderRadius: 50,
-                          background: '#FEE2E2', color: '#DC2626',
-                          fontSize: '0.72rem', fontFamily: 'Sora, sans-serif', fontWeight: 700,
-                          animation: 'pulse-glow 2s infinite',
-                        }}>🔴 Urgent</span>
+                        <span style={{ padding: '3px 10px', borderRadius: 50, background: '#FEE2E2', color: '#DC2626', fontSize: '0.72rem', fontFamily: 'Sora, sans-serif', fontWeight: 700 }}>🔴 Urgent</span>
                       )}
                       {event.streams.map(s => s !== 'All' && (
                         <span key={s} className="tag" style={{ fontSize: '0.72rem' }}>{s}</span>
                       ))}
                     </div>
-                    <h4 style={{
-                      fontFamily: 'Sora, sans-serif', fontWeight: 700, fontSize: '0.98rem',
-                      color: '#1E293B', marginBottom: 6,
-                    }}>{event.title}</h4>
-                    <p style={{ fontSize: '0.86rem', color: '#64748B', lineHeight: 1.6 }}>{event.description}</p>
+                    <h4 style={{ fontFamily: 'Sora, sans-serif', fontWeight: 700, fontSize: '0.98rem', color: '#1E293B', marginBottom: 6 }}>{event.title}</h4>
+                    <p style={{ fontSize: '0.86rem', color: '#64748B', lineHeight: 1.6, marginBottom: 10 }}>{event.description}</p>
+                    <div style={{ height: 5, background: '#F1F5F9', borderRadius: 50, overflow: 'hidden', maxWidth: 260 }}>
+                      <div style={{ height: '100%', width: `${urgencyPct}%`, background: isUrgent ? '#DC2626' : tc.color, borderRadius: 50, transition: 'width 0.3s' }} />
+                    </div>
                   </div>
 
-                  {/* Days left */}
-                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={{
-                      fontFamily: 'Sora, sans-serif', fontWeight: 800, fontSize: '1.5rem',
-                      color: isUrgent ? '#DC2626' : '#F97316',
-                    }}>{event.daysLeft}</div>
+                  <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                    <div style={{ fontFamily: 'Sora, sans-serif', fontWeight: 800, fontSize: '1.5rem', color: isUrgent ? '#DC2626' : '#F97316' }}>{event.daysLeft}</div>
                     <div style={{ fontSize: '0.72rem', color: '#94A3B8', fontFamily: 'DM Sans, sans-serif' }}>days left</div>
-                    <button className="btn btn-ghost" style={{ fontSize: '0.78rem', padding: '6px 14px', marginTop: 8 }}>
-                      🔔 Remind me
-                    </button>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button onClick={() => openReminderModal(event)} className="btn btn-ghost" style={{ fontSize: '0.76rem', padding: '6px 12px' }}>🔔 Remind me</button>
+                      <button onClick={() => downloadIcs(event)} className="btn btn-ghost" style={{ fontSize: '0.76rem', padding: '6px 12px' }}>📅 Add</button>
+                    </div>
                   </div>
                 </div>
               )
             })}
           </div>
         </div>
+        )}
 
-        {/* Past Events */}
-        {past.length > 0 && (
+        {!loading && past.length > 0 && (
           <div>
             <h3 style={{ fontFamily: 'DM Serif Display, serif', fontSize: '1.4rem', color: '#94A3B8', marginBottom: 16 }}>
               Past Events ({past.length})
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {past.map(event => {
-                const tc = TYPE_COLORS[event.type] || { color: '#64748B', bg: '#F8FAFC' }
-                return (
-                  <div key={event.id} style={{
-                    background: '#F8F9FA', border: '1px solid #E8E0D5',
-                    borderRadius: 14, padding: '16px 20px',
-                    display: 'flex', gap: 14, alignItems: 'center',
-                    opacity: 0.65,
-                  }}>
-                    <span style={{
-                      padding: '4px 12px', borderRadius: 50, fontSize: '0.72rem',
-                      fontFamily: 'Sora, sans-serif', fontWeight: 700,
-                      background: '#E2E8F0', color: '#64748B',
-                    }}>Closed</span>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontFamily: 'Sora, sans-serif', fontWeight: 600, fontSize: '0.9rem', color: '#64748B' }}>{event.title}</p>
-                      <p style={{ fontSize: '0.8rem', color: '#94A3B8' }}>Ended {Math.abs(event.daysLeft)} days ago</p>
-                    </div>
+              {past.map(event => (
+                <div key={event.id} style={{
+                  background: '#F8F9FA', border: '1px solid #E8E0D5', borderRadius: 14, padding: '16px 20px',
+                  display: 'flex', gap: 14, alignItems: 'center', opacity: 0.65,
+                }}>
+                  <span style={{ padding: '4px 12px', borderRadius: 50, fontSize: '0.72rem', fontFamily: 'Sora, sans-serif', fontWeight: 700, background: '#E2E8F0', color: '#64748B' }}>Closed</span>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontFamily: 'Sora, sans-serif', fontWeight: 600, fontSize: '0.9rem', color: '#64748B' }}>{event.title}</p>
                   </div>
-                )
-              })}
+                </div>
+              ))}
             </div>
           </div>
         )}
 
-        {/* Notification Signup */}
         <div style={{
-          background: 'linear-gradient(135deg, #0F172A, #1a2f4a)',
-          borderRadius: 22, padding: '40px', marginTop: 48,
-          textAlign: 'center',
+          background: 'linear-gradient(135deg, #0F172A, #1a2f4a)', borderRadius: 22, padding: '40px',
+          marginTop: 48, textAlign: 'center',
         }}>
           <div style={{ fontSize: '2.5rem', marginBottom: 16 }}>🔔</div>
           <h3 style={{ fontFamily: 'DM Serif Display, serif', color: 'white', fontSize: '1.6rem', marginBottom: 12 }}>
             Never Miss a Deadline
           </h3>
           <p style={{ color: 'rgba(255,255,255,0.65)', marginBottom: 28, maxWidth: 440, margin: '0 auto 28px' }}>
-            Get WhatsApp and SMS reminders for admissions, scholarships, and important exam dates.
+            Get email reminders for admissions, scholarships, and important exam dates — pick your own date, or let us choose for you.
           </p>
           <div style={{ display: 'flex', gap: 10, maxWidth: 440, margin: '0 auto', flexWrap: 'wrap' }}>
             <input
-              type="tel"
-              placeholder="Enter your WhatsApp number"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Enter your email"
               className="form-input"
               style={{ flex: 1, minWidth: 220, background: 'rgba(255,255,255,0.08)', border: '1.5px solid rgba(255,255,255,0.15)', color: 'white' }}
             />
-            <button className="btn btn-primary" style={{ whiteSpace: 'nowrap' }}>
+            <button className="btn btn-primary" onClick={() => openReminderModal('general')} style={{ whiteSpace: 'nowrap' }}>
               Subscribe Free
             </button>
           </div>
+          {subMsg && <p style={{ color: '#FED7AA', marginTop: 14, fontSize: '0.85rem' }}>{subMsg}</p>}
         </div>
       </div>
+
+      {/* Reminder Modal */}
+      {modalEvent && (
+        <div
+          onClick={closeModal}
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.55)',
+            backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 1000, padding: 20,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: 'white', borderRadius: 20, padding: '32px 30px', maxWidth: 420, width: '100%',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.25)', animation: 'modalPop 0.18s ease-out',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
+              <div>
+                <p style={{ fontSize: '0.72rem', fontFamily: 'Sora, sans-serif', fontWeight: 700, color: '#F97316', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
+                  🔔 Set a Reminder
+                </p>
+                <h3 style={{ fontFamily: 'DM Serif Display, serif', fontSize: '1.3rem', color: '#1E293B', lineHeight: 1.3 }}>
+                  {modalIsGeneral ? 'All high-priority deadlines' : modalEventObj.title}
+                </h3>
+              </div>
+              <button
+                onClick={closeModal}
+                style={{ background: '#F1F5F9', border: 'none', borderRadius: 50, width: 30, height: 30, cursor: 'pointer', fontSize: '1rem', color: '#64748B', flexShrink: 0 }}
+              >✕</button>
+            </div>
+
+            {modalEventObj?.deadline && (
+              <p style={{ fontSize: '0.82rem', color: '#94A3B8', marginBottom: 20 }}>
+                Deadline: <strong style={{ color: '#64748B' }}>{modalEventObj.deadline}</strong>
+              </p>
+            )}
+
+            <label style={{ display: 'block', fontSize: '0.78rem', fontFamily: 'Sora, sans-serif', fontWeight: 600, color: '#64748B', marginBottom: 6 }}>
+              Email address
+            </label>
+            <input
+              type="email"
+              value={modalEmail}
+              onChange={e => setModalEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="form-input"
+              style={{ width: '100%', marginBottom: 18, boxSizing: 'border-box' }}
+            />
+
+            <label style={{ display: 'block', fontSize: '0.78rem', fontFamily: 'Sora, sans-serif', fontWeight: 600, color: '#64748B', marginBottom: 6 }}>
+              Remind me on
+            </label>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+              <input
+                type="date"
+                value={modalDate}
+                min={todayStr}
+                max={maxDateStr}
+                onChange={e => setModalDate(e.target.value)}
+                className="form-input"
+                style={{ flex: 1.4, boxSizing: 'border-box' }}
+              />
+              <input
+                type="time"
+                value={modalTime}
+                onChange={e => setModalTime(e.target.value)}
+                className="form-input"
+                style={{ flex: 1, boxSizing: 'border-box' }}
+              />
+            </div>
+
+            {modalEventObj?.deadline && (
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
+                {[30, 7, 3, 1].map(n => (
+                  <button
+                    key={n}
+                    onClick={() => setModalDate(daysBefore(modalEventObj.deadline, n))}
+                    style={{
+                      padding: '5px 12px', borderRadius: 50, fontSize: '0.74rem',
+                      fontFamily: 'Sora, sans-serif', fontWeight: 600, cursor: 'pointer',
+                      border: modalDate === daysBefore(modalEventObj.deadline, n) ? 'none' : '1.5px solid #E8E0D5',
+                      background: modalDate === daysBefore(modalEventObj.deadline, n) ? '#0F172A' : 'transparent',
+                      color: modalDate === daysBefore(modalEventObj.deadline, n) ? 'white' : '#64748B',
+                    }}
+                  >{n} day{n === 1 ? '' : 's'} before</button>
+                ))}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={closeModal} className="btn btn-ghost" style={{ flex: 1 }}>Cancel</button>
+              <button
+                onClick={confirmSubscribe}
+                disabled={submitting}
+                className="btn btn-primary"
+                style={{ flex: 1, opacity: submitting ? 0.6 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
+              >
+                {submitting ? 'Saving...' : 'Confirm Reminder'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes modalPop {
+          from { opacity: 0; transform: scale(0.96) translateY(6px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+      `}</style>
     </div>
   )
 }
