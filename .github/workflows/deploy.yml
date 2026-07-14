@@ -1,45 +1,36 @@
 name: Deploy to AWS
-
 on:
   push:
     branches: [main]
-
 jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
-
+          node-version: '22'
       - name: Install and build React
         run: |
           cd school
           npm install
           npm run build
         env:
-          VITE_API_URL: http://${{ secrets.EC2_HOST }}:5000
-
+          VITE_API_URL: https://pathfinder-api.duckdns.org
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-
       - name: Upload to S3
         run: aws s3 sync school/dist s3://pathfinder-frontend-2026 --delete
-
       - name: Invalidate CloudFront cache
         run: aws cloudfront create-invalidation --distribution-id E3TLCI4XOP06AT --paths "/*"
-
   deploy-backend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -48,7 +39,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/aws-deployment
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             cd school/server
             echo "PORT=5000" > .env
             echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
