@@ -234,7 +234,7 @@ export const FIELDS = [
 ]
 
 // ─────────────────────────────────────────────────────────
-//  UNIQUE QUESTIONS PER FIELD  (5 questions each)
+//  UNIQUE QUESTIONS PER FIELD  (8 questions each)
 //  SCORING RULE: Exactly ONE option scores 4 per question.
 //  Spread: 4 = perfect fit, 3 = good fit, 2 = partial, 1 = poor fit
 // ─────────────────────────────────────────────────────────
@@ -286,6 +286,33 @@ export const FIELD_QUESTIONS = {
         { text: 'Something completely unrelated to computers', score: 1 },
       ],
     },
+    {
+      q: 'How do you feel about learning a completely new programming language or tool on your own?',
+      options: [
+        { text: 'Excited — I dive in and figure it out through documentation', score: 4 }, // ✅ best fit
+        { text: 'I can manage but prefer structured courses', score: 3 },
+        { text: 'I need someone to guide me through it', score: 2 },
+        { text: 'I avoid learning new tools unless required', score: 1 },
+      ],
+    },
+    {
+      q: 'Which project would excite you more?',
+      options: [
+        { text: 'Building an AI chatbot that learns from conversations', score: 4 }, // ✅ best fit
+        { text: 'Creating a secure banking app', score: 3 },
+        { text: 'Designing a simple personal website', score: 2 },
+        { text: 'None of these sound appealing', score: 1 },
+      ],
+    },
+    {
+      q: 'Working in a team using version control (like Git), you:',
+      options: [
+        { text: 'Enjoy collaborating and merging code with others', score: 4 },    // ✅ best fit
+        { text: 'Prefer working solo but can collaborate when needed', score: 3 },
+        { text: 'Find teamwork on code confusing', score: 2 },
+        { text: 'Would rather not code in a team setting', score: 1 },
+      ],
+    },
   ],
 
   medicine: [
@@ -332,6 +359,33 @@ export const FIELD_QUESTIONS = {
         { text: 'Research to discover new cures and medicines', score: 3 },
         { text: 'Managing a hospital or healthcare system', score: 2 },
         { text: 'Working in a pharmacy or community clinic', score: 2 },
+      ],
+    },
+    {
+      q: 'You need to memorize hundreds of pages of anatomy for an exam. You:',
+      options: [
+        { text: 'Actually enjoy the deep, detailed memorization', score: 4 },      // ✅ best fit
+        { text: 'Find it tedious but push through', score: 3 },
+        { text: 'Struggle to retain that much detail', score: 2 },
+        { text: 'This kind of study doesn\'t appeal to me at all', score: 1 },
+      ],
+    },
+    {
+      q: 'Seeing blood or medical procedures makes you feel:',
+      options: [
+        { text: 'Curious and calm — I want to understand what\'s happening', score: 4 }, // ✅ best fit
+        { text: 'A little uneasy but manageable', score: 3 },
+        { text: 'Quite uncomfortable', score: 2 },
+        { text: 'I actively avoid such situations', score: 1 },
+      ],
+    },
+    {
+      q: 'Which of these would you find most rewarding?',
+      options: [
+        { text: 'Diagnosing a rare illness that other doctors missed', score: 4 }, // ✅ best fit
+        { text: 'Running community health camps in rural areas', score: 3 },
+        { text: 'Publishing research that improves treatment protocols', score: 3 },
+        { text: 'None of these excite me particularly', score: 1 },
       ],
     },
   ],
@@ -382,6 +436,33 @@ export const FIELD_QUESTIONS = {
         { text: 'None of these appeal to me', score: 1 },
       ],
     },
+    {
+      q: 'You\'re negotiating a deal and the other side won\'t budge. You:',
+      options: [
+        { text: 'Stay calm and find a creative way to reach a win-win', score: 4 }, // ✅ best fit
+        { text: 'Push firmly for your original terms', score: 3 },
+        { text: 'Ask someone more experienced to take over', score: 2 },
+        { text: 'Walk away rather than negotiate further', score: 1 },
+      ],
+    },
+    {
+      q: 'Reading about stock markets, IPOs, or company mergers feels:',
+      options: [
+        { text: 'Genuinely exciting — I follow business news regularly', score: 4 }, // ✅ best fit
+        { text: 'Interesting when I have time', score: 3 },
+        { text: 'A bit dry but I understand its importance', score: 2 },
+        { text: 'Not something I care to follow', score: 1 },
+      ],
+    },
+    {
+      q: 'If your startup idea failed, you would:',
+      options: [
+        { text: 'Analyse what went wrong and try again with a new idea', score: 4 }, // ✅ best fit
+        { text: 'Take a break, then consider trying again', score: 3 },
+        { text: 'Feel discouraged and look for a stable job instead', score: 2 },
+        { text: 'Avoid entrepreneurship altogether after that', score: 1 },
+      ],
+    },
   ],
 
   law: [
@@ -428,6 +509,33 @@ export const FIELD_QUESTIONS = {
         { text: 'IPS — maintaining law and order, fighting crime', score: 3 },
         { text: 'A lawyer defending those who can\'t afford one', score: 3 },
         { text: 'None of these — civil services doesn\'t appeal to me', score: 1 },
+      ],
+    },
+    {
+      q: 'You\'re given a 100-page legal document to review overnight. You:',
+      options: [
+        { text: 'Dive in — I enjoy dissecting dense text for key details', score: 4 }, // ✅ best fit
+        { text: 'Get through it methodically, though it\'s tiring', score: 3 },
+        { text: 'Skim for the important parts only', score: 2 },
+        { text: 'Find this kind of task overwhelming', score: 1 },
+      ],
+    },
+    {
+      q: 'Which skill do you feel is your strongest?',
+      options: [
+        { text: 'Constructing a logical, persuasive argument', score: 4 },         // ✅ best fit
+        { text: 'Memorising facts, dates, and precedents', score: 3 },
+        { text: 'Speaking confidently in public', score: 3 },
+        { text: 'None of these are strengths of mine', score: 1 },
+      ],
+    },
+    {
+      q: 'A client\'s case looks weak on paper, but you believe they\'re right. You:',
+      options: [
+        { text: 'Dig deeper to find a legal angle that could still win', score: 4 }, // ✅ best fit
+        { text: 'Advise them honestly about the risks but still try', score: 3 },
+        { text: 'Suggest they settle rather than fight', score: 2 },
+        { text: 'Feel it\'s not worth the effort', score: 1 },
       ],
     },
   ],
@@ -478,6 +586,33 @@ export const FIELD_QUESTIONS = {
         { text: 'I\'d rather avoid engineering entrance exams', score: 1 },
       ],
     },
+    {
+      q: 'Given a stack of technical blueprints, you:',
+      options: [
+        { text: 'Study them carefully to understand every measurement', score: 4 }, // ✅ best fit
+        { text: 'Get the gist but need help with fine details', score: 3 },
+        { text: 'Find blueprints confusing', score: 2 },
+        { text: 'Have no interest in reading technical drawings', score: 1 },
+      ],
+    },
+    {
+      q: 'Which sounds like a satisfying weekend project?',
+      options: [
+        { text: 'Building a small drone or robotic arm from scratch', score: 4 },  // ✅ best fit
+        { text: 'Assembling a computer or gaming PC', score: 3 },
+        { text: 'Fixing a leaking tap or wiring a lamp', score: 2 },
+        { text: 'None of these — I\'d rather do something else', score: 1 },
+      ],
+    },
+    {
+      q: 'Working with CAD software (computer-aided design) to design parts sounds:',
+      options: [
+        { text: 'Exciting — precision design work appeals to me', score: 4 },      // ✅ best fit
+        { text: 'Fine, I could learn it if needed', score: 3 },
+        { text: 'Tedious but doable', score: 2 },
+        { text: 'Not something I\'d enjoy', score: 1 },
+      ],
+    },
   ],
 
   arts: [
@@ -524,6 +659,33 @@ export const FIELD_QUESTIONS = {
         { text: 'UX / Graphic Designer — making digital products beautiful', score: 3 },
         { text: 'Journalist — investigating and reporting real stories', score: 3 },
         { text: 'None of these — I prefer structured, factual work', score: 1 },
+      ],
+    },
+    {
+      q: 'You\'re asked to present your creative work to a critical audience. You:',
+      options: [
+        { text: 'Look forward to it — feedback helps me grow', score: 4 },         // ✅ best fit
+        { text: 'Feel nervous but do it anyway', score: 3 },
+        { text: 'Would rather share it privately first', score: 2 },
+        { text: 'Avoid showing my work to others', score: 1 },
+      ],
+    },
+    {
+      q: 'Which best describes your relationship with rules in creative work?',
+      options: [
+        { text: 'I love bending or breaking conventions to create something new', score: 4 }, // ✅ best fit
+        { text: 'I follow the basics but add my own twist', score: 3 },
+        { text: 'I prefer clear guidelines to work within', score: 2 },
+        { text: 'I\'m not very experimental with creative rules', score: 1 },
+      ],
+    },
+    {
+      q: 'A brand asks you to create content matching their style, not yours. You:',
+      options: [
+        { text: 'Enjoy the challenge of adapting my style to theirs', score: 4 },  // ✅ best fit
+        { text: 'Can do it, but prefer projects that reflect my own voice', score: 3 },
+        { text: 'Find it hard to create outside my natural style', score: 2 },
+        { text: 'Would rather turn down work that isn\'t authentically mine', score: 1 },
       ],
     },
   ],
@@ -574,6 +736,33 @@ export const FIELD_QUESTIONS = {
         { text: 'Weak — I find these very difficult', score: 1 },
       ],
     },
+    {
+      q: 'You get an unexpected result in an experiment that contradicts your hypothesis. You:',
+      options: [
+        { text: 'Get excited — this could lead to a new discovery', score: 4 },    // ✅ best fit
+        { text: 'Double-check your method before concluding anything', score: 3 },
+        { text: 'Feel frustrated that the experiment "failed"', score: 2 },
+        { text: 'Would rather move to a different experiment', score: 1 },
+      ],
+    },
+    {
+      q: 'Reading a dense scientific research paper feels:',
+      options: [
+        { text: 'Engaging — I enjoy following the logic and evidence', score: 4 }, // ✅ best fit
+        { text: 'Doable with effort and time', score: 3 },
+        { text: 'Difficult but I push through when necessary', score: 2 },
+        { text: 'Not something I\'d choose to do', score: 1 },
+      ],
+    },
+    {
+      q: 'Which motivates you more in science?',
+      options: [
+        { text: 'Answering questions no one has answered before', score: 4 },      // ✅ best fit
+        { text: 'Applying known science to solve practical problems', score: 3 },
+        { text: 'Teaching others about scientific concepts', score: 2 },
+        { text: 'None of these really motivate me', score: 1 },
+      ],
+    },
   ],
 
   education: [
@@ -620,6 +809,33 @@ export const FIELD_QUESTIONS = {
         { text: 'Your students consistently top national exams', score: 3 },
         { text: 'You design a curriculum used across 100 schools', score: 3 },
         { text: 'None of these feel personally significant to me', score: 1 },
+      ],
+    },
+    {
+      q: 'A student in your class is struggling and falling behind. You:',
+      options: [
+        { text: 'Take extra time to find a way that clicks for them', score: 4 },  // ✅ best fit
+        { text: 'Suggest they get tutoring elsewhere', score: 3 },
+        { text: 'Give them more practice material and hope it helps', score: 2 },
+        { text: 'Accept that not every student will keep up', score: 1 },
+      ],
+    },
+    {
+      q: 'How do you feel about grading and giving constructive feedback?',
+      options: [
+        { text: 'I enjoy it — helping students improve is rewarding', score: 4 },  // ✅ best fit
+        { text: 'It\'s fine, though time-consuming', score: 3 },
+        { text: 'I find it a tedious part of the job', score: 2 },
+        { text: 'I\'d rather avoid evaluating others\' work', score: 1 },
+      ],
+    },
+    {
+      q: 'Which teaching tool excites you most?',
+      options: [
+        { text: 'Creating interactive lessons using stories or real-life examples', score: 4 }, // ✅ best fit
+        { text: 'Using technology like videos and apps in class', score: 3 },
+        { text: 'Sticking to textbooks and structured lesson plans', score: 2 },
+        { text: 'I haven\'t thought much about teaching methods', score: 1 },
       ],
     },
   ],
@@ -670,6 +886,33 @@ export const FIELD_QUESTIONS = {
         { text: 'Don\'t interest me much at all', score: 1 },
       ],
     },
+    {
+      q: 'You visit a farm and see crops damaged by pests. You:',
+      options: [
+        { text: 'Get curious about the pest and how to control it sustainably', score: 4 }, // ✅ best fit
+        { text: 'Feel bad for the farmer but aren\'t sure what to do', score: 2 },
+        { text: 'Think someone with more expertise should handle it', score: 2 },
+        { text: 'Farming problems don\'t really interest me', score: 1 },
+      ],
+    },
+    {
+      q: 'Which technology in modern farming excites you?',
+      options: [
+        { text: 'Drones and sensors that monitor crop health', score: 4 },         // ✅ best fit
+        { text: 'Genetically improved seeds that resist disease', score: 3 },
+        { text: 'Automated irrigation systems', score: 3 },
+        { text: 'I\'m not very interested in agri-tech', score: 1 },
+      ],
+    },
+    {
+      q: 'Spending a full day working in the field under the sun sounds:',
+      options: [
+        { text: 'Fulfilling — hands-on work connects me to the outcome', score: 4 }, // ✅ best fit
+        { text: 'Fine occasionally, not as a daily routine', score: 3 },
+        { text: 'Tough, but I\'d do it for the right cause', score: 2 },
+        { text: 'Not something I want as part of my career', score: 1 },
+      ],
+    },
   ],
 
   defence: [
@@ -716,6 +959,33 @@ export const FIELD_QUESTIONS = {
         { text: 'IPS / Police — maintaining law and order at home', score: 3 },
         { text: 'Intelligence Bureau — working in covert national security', score: 3 },
         { text: 'I\'m unsure — defence seems tough but I haven\'t decided', score: 1 },
+      ],
+    },
+    {
+      q: 'You\'re given an order you personally disagree with. You:',
+      options: [
+        { text: 'Follow it professionally, then raise concerns through proper channels', score: 4 }, // ✅ best fit
+        { text: 'Follow it but feel uneasy about it', score: 3 },
+        { text: 'Try to convince the senior officer to change it first', score: 2 },
+        { text: 'Would struggle to follow an order I disagree with', score: 1 },
+      ],
+    },
+    {
+      q: 'Living away from family for months at a posting sounds:',
+      options: [
+        { text: 'Manageable — I understand it\'s part of the commitment', score: 4 }, // ✅ best fit
+        { text: 'Hard, but I could adjust over time', score: 3 },
+        { text: 'Very difficult for me personally', score: 2 },
+        { text: 'A dealbreaker for me', score: 1 },
+      ],
+    },
+    {
+      q: 'Which quality do you think matters most in the forces?',
+      options: [
+        { text: 'Discipline and unwavering commitment to duty', score: 4 },        // ✅ best fit
+        { text: 'Physical strength and endurance', score: 3 },
+        { text: 'Strategic thinking under pressure', score: 3 },
+        { text: 'I haven\'t thought about what matters most', score: 1 },
       ],
     },
   ],
@@ -766,6 +1036,33 @@ export const FIELD_QUESTIONS = {
         { text: 'None of these sound exciting to me', score: 1 },
       ],
     },
+    {
+      q: 'A guest complains angrily about their hotel room. You:',
+      options: [
+        { text: 'Stay calm, listen fully, and resolve it with a smile', score: 4 }, // ✅ best fit
+        { text: 'Apologise and pass it to a manager', score: 3 },
+        { text: 'Feel flustered but try to handle it', score: 2 },
+        { text: 'Avoid confrontational situations like this', score: 1 },
+      ],
+    },
+    {
+      q: 'Planning a multi-city trip itinerary for a group sounds:',
+      options: [
+        { text: 'Fun — I love organising logistics and experiences', score: 4 },   // ✅ best fit
+        { text: 'Doable, though a bit stressful with big groups', score: 3 },
+        { text: 'Something I\'d need a lot of help with', score: 2 },
+        { text: 'Not appealing to me at all', score: 1 },
+      ],
+    },
+    {
+      q: 'Working on holidays and weekends, when the hospitality industry is busiest, feels:',
+      options: [
+        { text: 'Fine — that\'s when the excitement happens', score: 4 },          // ✅ best fit
+        { text: 'Acceptable if the pay and role are worth it', score: 3 },
+        { text: 'A significant downside for me', score: 2 },
+        { text: 'A dealbreaker — I want a fixed weekend routine', score: 1 },
+      ],
+    },
   ],
 
   social: [
@@ -812,6 +1109,33 @@ export const FIELD_QUESTIONS = {
         { text: 'Creating a mental health support network for rural women', score: 3 },
         { text: 'Influencing a government policy that reduces poverty', score: 3 },
         { text: 'Being promoted to a senior corporate position', score: 1 },
+      ],
+    },
+    {
+      q: 'A community project you\'re running isn\'t getting the results you hoped for. You:',
+      options: [
+        { text: 'Adapt the approach and keep trying — change takes time', score: 4 }, // ✅ best fit
+        { text: 'Feel discouraged but continue', score: 3 },
+        { text: 'Consider switching to a different project', score: 2 },
+        { text: 'Feel this kind of work isn\'t for me', score: 1 },
+      ],
+    },
+    {
+      q: 'Convincing a sceptical village elder to support a new community programme, you:',
+      options: [
+        { text: 'Build trust patiently through conversation and small wins', score: 4 }, // ✅ best fit
+        { text: 'Bring in facts and data to make your case', score: 3 },
+        { text: 'Ask a more senior or respected person to help persuade them', score: 2 },
+        { text: 'Would find this too difficult to attempt', score: 1 },
+      ],
+    },
+    {
+      q: 'Which reward matters most to you in your work?',
+      options: [
+        { text: 'Seeing direct, tangible change in someone\'s life', score: 4 },   // ✅ best fit
+        { text: 'Long-term systemic impact, even if slow', score: 3 },
+        { text: 'Recognition for the work being done', score: 2 },
+        { text: 'Primarily financial stability', score: 1 },
       ],
     },
   ],
