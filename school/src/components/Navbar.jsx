@@ -3,12 +3,15 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 const NAV_LINKS = [
-  { label: 'Home',       to: '/' },
-  { label: 'Learn',      to: '/learn' },
-  { label: 'Take Quiz',  to: '/quiz' },
-  { label: 'Career Map', to: '/careers' },
-  { label: 'Colleges',   to: '/colleges' },
-  { label: 'Timeline',   to: '/timeline' },
+  { label: 'Home',        to: '/' },
+  { label: 'Learn',       to: '/learn' },
+  { label: 'Take Quiz',   to: '/quiz' },
+  { label: 'Career Map',  to: '/careers' },
+  { label: 'Scholarships',to: '/scholarships' },
+  // { label: 'Resources',   to: '/resources' },
+  { label: 'Community',   to: '/community' },
+  { label: 'Colleges',    to: '/colleges' },
+  { label: 'Timeline',    to: '/timeline' },
 ]
 
 // ─── Mini Dashboard Panel ─────────────────────────────────────────────────────

@@ -3,7 +3,7 @@ import { AuthProvider }  from './context/AuthContext'
 import ProtectedRoute    from './components/ProtectedRoute'
 import Navbar            from './components/Navbar'
 import Footer            from './components/Footer'
-import AIAssistant       from './components/AIAssistant'
+import AIAssistant        from './components/AIAssistant'
 import Home              from './pages/Home'
 import Quiz              from './pages/Quiz'
 import FieldQuiz         from './pages/Fieldquiz'
@@ -13,11 +13,13 @@ import Timeline          from './pages/Timeline'
 import Dashboard         from './pages/Dashboard'
 import Login             from './pages/Login'
 import Signup            from './pages/Signup'
-import ResetPassword from './pages/ResetPassword'
+import ResetPassword     from './pages/ResetPassword'
+import Scholarships      from './pages/Scholarships'       
+import Community         from './pages/Community'      
 
-import LearnSection      from './components/LearnSection'  // ✅ new
+import LearnSection      from './components/LearnSection'
+
 export default function App() {
-  
   return (
     <AuthProvider>
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -25,15 +27,12 @@ export default function App() {
         <main style={{ flex: 1 }}>
           <Routes>
             {/* ── Public Routes ── */}
-            <Route path="/"       element={<Home />} />
-            <Route path="/login"  element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/"              element={<Home />} />
+            <Route path="/login"         element={<Login />} />
+            <Route path="/signup"        element={<Signup />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            
 
             {/* ── Protected Routes ── */}
-
-            
             <Route path="/quiz" element={
               <ProtectedRoute><Quiz /></ProtectedRoute>
             } />
@@ -55,6 +54,12 @@ export default function App() {
             <Route path="/learn" element={
               <ProtectedRoute><LearnSection /></ProtectedRoute>
             } />
+            <Route path="/scholarships" element={
+              <ProtectedRoute><Scholarships /></ProtectedRoute>
+            } />
+            <Route path="/community" element={
+              <ProtectedRoute><Community /></ProtectedRoute>
+            } />
 
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
@@ -65,5 +70,3 @@ export default function App() {
     </AuthProvider>
   )
 }
-
-

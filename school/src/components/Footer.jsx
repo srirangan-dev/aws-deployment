@@ -7,6 +7,9 @@ const LINKS = {
     { label: 'Colleges',     to: '/colleges'  },
     { label: 'Timeline',     to: '/timeline'  },
     { label: 'Dashboard',    to: '/dashboard' },
+    { label: 'Scholarships', to: '/scholarships' },
+    // { label: 'Resources',    to: '/resources'    },
+    { label: 'Community',    to: '/community'    },
   ],
   
   Account: [
