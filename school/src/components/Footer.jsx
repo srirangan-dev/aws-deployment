@@ -5,7 +5,7 @@ const LINKS = {
     { label: 'Take Quiz',    to: '/quiz'      },
     { label: 'Career Map',   to: '/careers'   },
     { label: 'Colleges',     to: '/colleges'  },
-    { label: 'Timeline',     to: '/timeline'  },
+    // { label: 'Timeline',     to: '/timeline'  },
     { label: 'Dashboard',    to: '/dashboard' },
     { label: 'Scholarships', to: '/scholarships' },
     // { label: 'Resources',    to: '/resources'    },

@@ -9,7 +9,7 @@ import Quiz              from './pages/Quiz'
 import FieldQuiz         from './pages/Fieldquiz'
 import CareerPaths       from './pages/Careerpaths'
 import Colleges          from './pages/Colleges'
-import Timeline          from './pages/Timeline'
+// import Timeline          from './pages/Timeline'
 import Dashboard         from './pages/Dashboard'
 import Login             from './pages/Login'
 import Signup            from './pages/Signup'
@@ -44,9 +44,6 @@ export default function App() {
             } />
             <Route path="/colleges" element={
               <ProtectedRoute><Colleges /></ProtectedRoute>
-            } />
-            <Route path="/timeline" element={
-              <ProtectedRoute><Timeline /></ProtectedRoute>
             } />
             <Route path="/dashboard" element={
               <ProtectedRoute><Dashboard /></ProtectedRoute>

@@ -11,7 +11,7 @@ const NAV_LINKS = [
   // { label: 'Resources',   to: '/resources' },
   { label: 'Community',   to: '/community' },
   { label: 'Colleges',    to: '/colleges' },
-  { label: 'Timeline',    to: '/timeline' },
+  // { label: 'Timeline',    to: '/timeline' },
 ]
 
 // ─── Mini Dashboard Panel ─────────────────────────────────────────────────────
