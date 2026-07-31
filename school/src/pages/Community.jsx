@@ -1,12 +1,12 @@
 // src/pages/Community.jsx
 const MENTORS = [
-  { id: 1, name: 'Priya Raman',    role: 'NIT Trichy · 3rd Year, ECE',       expertise: ['Science', 'JEE'],              phone: '+91 98765 43210', email: 'priya.mentor@gmail.com',    whatsapp: '919876543210' },
-  { id: 2, name: 'Suresh Kumar',   role: 'CA Intermediate',                  expertise: ['Commerce', 'CA'],               phone: '+91 91234 56789', email: 'suresh.mentor@gmail.com',   whatsapp: '919123456789' },
-  { id: 3, name: 'Meera Iyer',     role: 'School Counsellor, Chennai',       expertise: ['Arts', 'CUET', 'Career Guidance'], phone: '+91 90000 11122', email: 'meera.counsellor@gmail.com', whatsapp: '919000011122' },
-  { id: 4, name: 'Dr. Ashok Nair', role: 'Physics Teacher, 15+ yrs',         expertise: ['Science', 'NEET', 'JEE'],       phone: '+91 90111 22334', email: 'ashok.teacher@gmail.com',   whatsapp: '919011122334' },
-  { id: 5, name: 'Farah Sheikh',   role: 'Career Counsellor & Psychologist', expertise: ['Career Guidance', 'Mental Health'], phone: '+91 90222 33445', email: 'farah.counsellor@gmail.com', whatsapp: '919022233445' },
-  { id: 6, name: 'Karthik Menon',  role: 'IIT Madras · Alumnus, Data Science', expertise: ['Science', 'Engineering'],     phone: '+91 90333 44556', email: 'karthik.mentor@gmail.com',  whatsapp: '919033344556' },
-  { id: 7, name: 'Lakshmi Pillai', role: 'Commerce Faculty, 10+ yrs',        expertise: ['Commerce', 'CA', 'CS'],         phone: '+91 90444 55667', email: 'lakshmi.teacher@gmail.com', whatsapp: '919044455667' },
+  { id: 1, name: 'Sri Rangan T',    role: 'Kongu Engineering College Erode · 3rd Year, ECE', expertise: ['Science', 'JEE'],                  phone: '+91 90258 77314', email: 'sri.mentor@gmail.com',       whatsapp: '919025877314' },
+  { id: 2, name: 'Sibi Saran',      role: 'CA Intermediate',                                 expertise: ['Commerce', 'CA'],                   phone: '+91 91234 56789', email: 'sibi.mentor@gmail.com',      whatsapp: '919123456789' },
+  { id: 3, name: 'Shyamala',        role: 'School Counsellor, Madurai',                      expertise: ['Arts', 'CUET', 'Career Guidance'],  phone: '+91 86376 48594', email: 'shyamala.counsellor@gmail.com', whatsapp: '918637648594' },
+  { id: 4, name: 'Dr. Ashok Nair',  role: 'Physics Teacher, 15+ yrs',                        expertise: ['Science', 'NEET', 'JEE'],           phone: '+91 90111 22334', email: 'ashok.teacher@gmail.com',    whatsapp: '919011122334' },
+  { id: 5, name: 'Farah Sheikh',    role: 'Career Counsellor & Psychologist',                expertise: ['Career Guidance', 'Mental Health'], phone: '+91 90222 33445', email: 'farah.counsellor@gmail.com', whatsapp: '919022233445' },
+  { id: 6, name: 'Karthik Menon',   role: 'IIT Madras · Alumnus, Data Science',              expertise: ['Science', 'Engineering'],           phone: '+91 90333 44556', email: 'karthik.mentor@gmail.com',   whatsapp: '919033344556' },
+  { id: 7, name: 'Lakshmi Pillai',  role: 'Commerce Faculty, 10+ yrs',                       expertise: ['Commerce', 'CA', 'CS'],             phone: '+91 90444 55667', email: 'lakshmi.teacher@gmail.com',  whatsapp: '919044455667' },
 ]
 
 const RESOURCES = [
@@ -85,10 +85,16 @@ function MentorCard({ m }) {
         <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '0.82rem', color: '#334155', overflow: 'hidden', textOverflow: 'ellipsis' }}>✉️ {m.email}</div>
       </div>
 
-      <a href={`mailto:${m.email}`} style={{
-        textAlign: 'center', textDecoration: 'none', padding: '9px 0', borderRadius: 10, marginTop: 4,
-        background: 'linear-gradient(135deg, #F97316, #F59E0B)', color: 'white', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '0.8rem',
-      }}>✉️ Email</a>
+      <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+        <a href={`mailto:${m.email}`} style={{
+          flex: 1, textAlign: 'center', textDecoration: 'none', padding: '9px 0', borderRadius: 10,
+          background: 'linear-gradient(135deg, #F97316, #F59E0B)', color: 'white', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '0.8rem',
+        }}>✉️ Email</a>
+        <a href={`https://wa.me/${m.whatsapp}`} target="_blank" rel="noopener noreferrer" style={{
+          flex: 1, textAlign: 'center', textDecoration: 'none', padding: '9px 0', borderRadius: 10,
+          background: '#25D366', color: 'white', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '0.8rem',
+        }}>💬 WhatsApp</a>
+      </div>
     </div>
   )
 }
