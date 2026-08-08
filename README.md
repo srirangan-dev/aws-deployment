@@ -1,7 +1,6 @@
 🧭 PathFinder — Your Career & Education Advisor
 AWS React Node.js Docker CI/CD Live
 
-
 An AI-powered career and education advisor web application, fully deployed on AWS with a production-grade DevOps pipeline.
 
 🌐 Live Demo: https://d16o598lw6btin.cloudfront.net/
