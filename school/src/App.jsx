@@ -16,8 +16,8 @@ import Signup            from './pages/Signup'
 import ResetPassword     from './pages/ResetPassword'
 import Scholarships      from './pages/Scholarships'       
 import Community         from './pages/Community'      
-
 import LearnSection      from './components/LearnSection'
+
 
 export default function App() {
   return (
