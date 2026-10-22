@@ -12,10 +12,11 @@ export default async function handler(req, res) {
         'Authorization': `Bearer ${process.env.GROQ_KEY}`
       },
       body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
+        model: "openai/gpt-oss-20b",
         messages: [{ role: "system", content: system }, ...messages],
         temperature: 0.4,
-        max_tokens: 512
+        max_tokens: 1500,
+        reasoning_effort: "low"
       })
     });
 
